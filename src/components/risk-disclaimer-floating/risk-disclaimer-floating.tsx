@@ -1,12 +1,68 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import styles from './risk-disclaimer-floating.module.scss';
 
 const RiskDisclaimerFloating = () => {
     const [is_open, setIsOpen] = useState(false);
+    const [position, setPosition] = useState(() => ({
+        x: typeof window === 'undefined' ? 20 : Math.max(12, window.innerWidth - 190),
+        y: typeof window === 'undefined' ? 80 : Math.max(12, window.innerHeight - 90),
+    }));
+    const drag_offset = useRef({ x: 0, y: 0 });
+    const drag_start = useRef({ x: 0, y: 0 });
+    const did_drag = useRef(false);
+
+    const onPointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        drag_offset.current = {
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top,
+        };
+        drag_start.current = { x: event.clientX, y: event.clientY };
+        did_drag.current = false;
+        event.currentTarget.setPointerCapture(event.pointerId);
+    };
+
+    const onPointerMove = (event: React.PointerEvent<HTMLButtonElement>) => {
+        if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
+
+        const moved_x = Math.abs(event.clientX - drag_start.current.x);
+        const moved_y = Math.abs(event.clientY - drag_start.current.y);
+        if (moved_x > 4 || moved_y > 4) did_drag.current = true;
+
+        const width = event.currentTarget.offsetWidth;
+        const height = event.currentTarget.offsetHeight;
+        const max_x = Math.max(12, window.innerWidth - width - 12);
+        const max_y = Math.max(12, window.innerHeight - height - 12);
+
+        setPosition({
+            x: Math.min(max_x, Math.max(12, event.clientX - drag_offset.current.x)),
+            y: Math.min(max_y, Math.max(12, event.clientY - drag_offset.current.y)),
+        });
+    };
+
+    const onPointerUp = (event: React.PointerEvent<HTMLButtonElement>) => {
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+        }
+    };
+
+    const onTriggerClick = () => {
+        if (!did_drag.current) setIsOpen(true);
+        did_drag.current = false;
+    };
 
     return (
         <>
-            <button className={styles.trigger} onClick={() => setIsOpen(true)} type='button'>
+            <button
+                className={styles.trigger}
+                style={{ left: position.x, top: position.y }}
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={onPointerUp}
+                onClick={onTriggerClick}
+                type='button'
+                aria-label='Move or open Risk Disclaimer'
+            >
                 <span className={styles.icon}>!</span>
                 <span>Risk Disclaimer</span>
             </button>

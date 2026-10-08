@@ -10,7 +10,6 @@ import Tabs from '@/components/shared_ui/tabs';
 import Text from '@/components/shared_ui/text';
 import Summary from '@/components/summary';
 import TradeAnimation from '@/components/trade-animation';
-import Transactions from '@/components/transactions';
 import { DBOT_TABS } from '@/constants/bot-contents';
 import { run_panel as RUN_PANEL_TABS } from '@/constants/run-panel';
 import { popover_zindex } from '@/constants/z-indexes';
@@ -166,9 +165,6 @@ const DrawerContent = ({ active_index, is_drawer_open, active_tour, setActiveTab
                 <div id='db-run-panel-tab__summary' label={<Localize i18n_default_text='Summary' />}>
                     <Summary is_drawer_open={is_drawer_open} />
                 </div>
-                <div id='db-run-panel-tab__transactions' label={<Localize i18n_default_text='Transactions' />}>
-                    <Transactions is_drawer_open={is_drawer_open} />
-                </div>
                 <div id='db-run-panel-tab__journal' label={<Localize i18n_default_text='Journal' />}>
                     <Journal is_drawer_open={is_drawer_open} />
                 </div>
@@ -207,19 +203,6 @@ const MobileDrawerFooter = () => {
         </div>
     );
 };
-
-type TMobileHistoryTrigger = { onClick: () => void };
-
-// Manual/Bulk/Copy/Scanner-type pages have their own trade controls, so they
-// don't need the Bot Builder-specific "Execution / Bot is not running" footer
-// (see 3920fef, which correctly stopped that footer overlapping their content).
-// But they still push real trades into the same Transactions store, so this
-// small trigger is how mobile users reach that history without the footer.
-const MobileHistoryTrigger = ({ onClick }: TMobileHistoryTrigger) => (
-    <button type='button' className='run-panel__mobile-history-trigger' onClick={onClick}>
-        <Localize i18n_default_text='Trade history' />
-    </button>
-);
 
 const StatisticsInfoModal = ({
     is_mobile,
@@ -374,14 +357,7 @@ const RunPanel = observer(() => {
                     {content}
                 </Drawer>
                 {!isDesktop && is_bot_builder && <MobileDrawerFooter />}
-                {!isDesktop && !is_bot_builder && !is_drawer_open && (
-                    <MobileHistoryTrigger
-                        onClick={() => {
-                            setActiveTabIndex(RUN_PANEL_TABS.TRANSACTIONS);
-                            toggleDrawer(true);
-                        }}
-                    />
-                )}
+
             </div>
 
             <StatisticsInfoModal

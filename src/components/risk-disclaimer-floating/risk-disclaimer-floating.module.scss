@@ -125,12 +125,3 @@
     font-weight: 700;
     cursor: pointer;
 }
-
-@media (width <= 900px) {
-    .trigger {
-        left: 1rem;
-        bottom: calc(8.8rem + env(safe-area-inset-bottom));
-        padding: 0.8rem 1rem;
-        font-size: 1.05rem;
-    }
-}

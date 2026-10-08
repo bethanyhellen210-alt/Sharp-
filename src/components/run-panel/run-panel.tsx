@@ -170,7 +170,7 @@ const DrawerContent = ({ active_index, is_drawer_open, active_tour, setActiveTab
                 </div>
             </Tabs>
             {/* Show StatisticsSummary on all tabs on desktop, only on non-Journal tabs on mobile */}
-            {((isDesktop && is_drawer_open) || (is_drawer_open && active_index !== 2) || active_tour) && (
+            {((isDesktop && is_drawer_open) || (is_drawer_open && active_index !== 1) || active_tour) && (
                 <StatisticsSummary {...props} />
             )}
         </>
@@ -329,11 +329,7 @@ const RunPanel = observer(() => {
         />
     );
 
-    // The drawer (Summary / Transactions / Journal) should be reachable from any
-    // trading tab that can produce a trade — not just Bot Builder — so Trade
-    // History works everywhere. Only the Bot Builder-specific Execution footer
-    // (MobileDrawerFooter) stays restricted below; Up & Down has no trades of
-    // its own to show here, so it's excluded like before.
+    // The run panel remains available on trading tabs. The transaction-history tab has been removed; the panel now contains only Summary and Journal. The Bot Builder-specific Execution footer remains restricted below.
     const show_run_panel = isDesktop || active_tab !== UP_AND_DOWN || active_tour;
     if (!show_run_panel || active_tour === 'bot_builder') return null;
 
